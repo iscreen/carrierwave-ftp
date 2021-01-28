@@ -12,6 +12,23 @@ module CarrierWave
         ftp_file(uploader.store_path(identifier))
       end
 
+      def cache!(file)
+        new_file = @cache_filename || cache_file
+        file.move_to new_file.to_s
+        SanitizedFile.new(new_file)
+      end
+
+      def retrieve_from_cache!(identifier)
+        SanitizedFile.new(@cache_filename || cache_file)
+      end
+
+      def delete_dir!(path)
+      end
+
+      def clean_cache!(_seconds)
+        FileUtils.rm_rf(@cache_filename.dirname) if Dir.exist?(@cache_filename.dirname)
+      end
+
       private
 
       def ftp_file(path)
